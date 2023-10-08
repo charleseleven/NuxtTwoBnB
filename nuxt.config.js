@@ -1,9 +1,13 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'nuxt-two-bnb',
+    //title: 'nuxt-two-bnb',
+    titleTemplate: 'Mastering Nuxt BnB: %s',
     htmlAttrs: {
       lang: 'en'
+    },
+    bodyAttrs: {
+      class: ['my-style']
     },
     meta: [
       { charset: 'utf-8' },
@@ -13,7 +17,12 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    ],
+  },
+
+  // To disable prefetch on all links: https://v2.nuxt.com/docs/features/nuxt-components#disable-prefetching-for-specific-links
+  router: {
+    prefetchLinks: false
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
