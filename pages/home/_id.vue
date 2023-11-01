@@ -22,12 +22,16 @@
     {{ home.baths }} baths <br />
     {{ home.description }} <br />
     <div style="height: 800px; width: 800px" ref="map"></div>
+    <div v-for="review in reviews" :key="review.objectID">
+      <img :src="review.reviewer.image" />
+      {{ review.reviewer.name }} <br />
+      {{ formatDate(review.date) }} <br />
+      <ShortText :text="review.comment" :target="150" /><br />
+    </div>
   </div>
 </template>
 
 <script>
-import homes from "~/data/homes";
-
 export default {
   name: "HomePage",
   head() {
@@ -36,11 +40,18 @@ export default {
     };
   },
   data() {
-    return {
-      home: {},
-    };
+    return {};
   },
-  methods: {},
+  methods: {
+    formatDate(dateStr) {
+      const date = new Date(dateStr).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        // day: "numeric",
+      });
+      return date;
+    },
+  },
   mounted() {
     this.$maps.showMap(
       this.$refs.map,
@@ -48,11 +59,24 @@ export default {
       this.home._geoloc.lng
     );
   },
-  created() {
-    const home = homes.find((home) => home.objectID === this.$route.params.id);
-    this.home = home;
-    console.log(this.$route);
-    console.log(this.$route.params.id);
+  async asyncData({ params, $dataApi, error }) {
+    const homeResponse = await $dataApi.getHome(params.id);
+    if (!homeResponse.ok) {
+      return error({
+        statusCode: homeResponse.status,
+        message: homeResponse.statusText,
+      });
+    }
+
+    const reviewResponse = await $dataApi.getReviewsByHomeId(params.id);
+    if (!reviewResponse.ok) {
+      return error({
+        statusCode: reviewResponse.status,
+        message: reviewResponse.statusText,
+      });
+    }
+
+    return { home: homeResponse.json, reviews: reviewResponse.json.hits };
   },
 };
 </script>
